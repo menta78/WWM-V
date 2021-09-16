@@ -1,0 +1,66 @@
+TEST SUITE FOR SCHISM-WWM
+last edited by Lorenzo Mentaschi in 03 2021
+
+
+This code is a start for a regtest suite for Schism/WWM. As of 23/03/2021 there are only a couple of tests working, but more are planned.
+
+
+
+# ARCHITECTURE
+This test suite is designed to be as simple as possible, while enabling the automated running of the cases and the test of the results. 
+The architecture is based on the utility unittest of python, which should be available in the standard python library.
+To run the test, the packages numpy and netCDF4 are needed by python, as they are necessary to load the results and test the output.
+
+By design this suite can only work on systems supporting the bash command line and the symbolic links (i.e. unix-like systems).
+
+To work the suite needs to know:
+- the python executable to be used (by default python3)
+- the path of the schismWWM executable
+- the path of the combine_outputXX executable
+- the path of the combine_hotstartXX executable (needed by the test of warm start).
+This info is provided by editing the file set_environ.sh, and adding the corresponding environment variables (see the example in this directory).
+The file set_environ.sh can also be used to set the necessary runtime paths (e.g. variables PATH or LD_LIBRARY_PATH).
+
+Each test is contained in its own directory. E.g. the code and the model setup testing the feature "my stuff" is located in the directory testMyStuff.
+Inside the directory testMyStuff we can find:
+- a file testMyStuff.py, with the actual tests, including running the model and loading the results for check.
+- a directory conf, which contains the model setup.
+- an empty file __init__.py, necessary for python to understand this is a source directory.
+
+When the test is launched, the content of the conf directory is linked in a new directory run, and the executables are launched there. If the test runs successfully the directory run is removed. If the test fails the directory run not deleted, so the developer can check outputs and logs. 
+
+
+
+
+
+# HOW TO LAUNCH THE TESTS
+- Edit the file set_environ.sh, indicating the path of your executables and setting your environment variables.
+- use the script regTests.sh:
+    $./regTests.sh # will print 2 use examples
+    $./regTests.sh -a # will run all the tests
+    $./regTests.sh -k testMyStuff* # will run all the tests matching the pattern testMyStuff*
+
+
+
+# DEVELOP A NEW TEST
+In the directory regTests:
+- copy the directory test2DExplicitPropagation to the new directory that corresponds to your new test. E.g.
+    $ cp -r test2DExplicitPropagation testMyStuff
+- review and modify the model setup in the directory regTests/testMyStuff/conf/, in order to reproduce what you want to test
+    you can test the new configuration by running schismWwm directly inside the conf dir, and when you see that it works clean it removing the output and the unnecessary files. 
+    The script cleanup.sh may help in this.
+- in the directory regTests/testMyStuff rename the test module:
+    $ mv test2DExplicitPropagation.py testMyStuff.py
+- edit the file testMyStuff.py
+   - rename the class, by substituting the line
+       class test2DExplicitPropagation(...
+     with the line
+       class testMyStuffPropagation(...
+   - if you need to do a single run, you can leave the first lines of the test as they are, and only edit the part where the results are checked.
+- debug your test
+   - you can use logs (print command in python).
+   - if the test fails, the run directory is not cleaned up, and you can check the output there.
+   - you can use pdb, a command-line debugger very similar to gdb. To use it add the line
+       import pdb; pdb.set_trace()
+     at the line where you want to start debugging in the file testMyStuff.py.
+

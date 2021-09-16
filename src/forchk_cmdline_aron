@@ -1,0 +1,1 @@
+forchk -shref -ninf -nwarn -ff -allc -I /home/aron/opt/netcdf4/include,/home/aron/opt/mpich_intel/include,/home/aron/git/pdlib/include -define ST42,NCDF,WWM_MPI,WWM_SOLVER,MPIVERSION=2,PDLIB *.F90 /home/aron/git/pdlib/src/*.F90 /home/aron/opt/netcdf_intel/netcdf.f90 /home/aron/opt/netcdf_intel/typeSizes.f90 /usr/local/share/forcheck/MPI.FLB
